@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+
 import os
 import sys
 import math
@@ -16,19 +17,37 @@ import matplotlib.pyplot as plt
 
 class WikiGraph:
 
-    def load_from_file(self, filename):
-        print('Загружаю граф из файла: ' + filename)
+    def load_from_file(self, file):
+        print('Загружаю граф из файла: ' + file)
 
-        with open(filename) as f:
-            (n, _nlinks) = (0, 0) # TODO: прочитать из файла
-            
+        with open(file) as f:
+            s=list(map(int, f.readline().split()))
+            (n, _nlinks) = (s[0],s[1])
+
             self._titles = []
             self._sizes = array.array('L', [0]*n)
             self._links = array.array('L', [0]*_nlinks)
             self._redirect = array.array('B', [0]*n)
             self._offset = array.array('L', [0]*(n+1))
 
-            # TODO: прочитать граф из файла
+            for i in range(n):
+                s=f.readline()
+                s = s.rstrip()
+                self._titles.append(s)
+                s=list(map(int, f.readline().split()))
+                self._sizes[i] = s[0]
+                self._redirect[i] = s[1]
+                for k in range(s[2]):
+                    self._links[k] = int(f.readline())
+                if i==0:
+                    self._offset[i]=0
+                else:
+                    self._offset[i] = s[2]+self._offset[i-1]
+
+
+
+
+
 
         print('Граф загружен')
 
@@ -60,16 +79,7 @@ def hist(fname, data, bins, xlabel, ylabel, title, facecolor='green', alpha=0.5,
 
 
 if __name__ == '__main__':
-
-    if len(sys.argv) != 2:
-        print('Использование: wiki_stats.py <файл с графом статей>')
-        sys.exit(-1)
-
-    if os.path.isfile(sys.argv[1]):
-        wg = WikiGraph()
-        wg.load_from_file(sys.argv[1])
-    else:
-        print('Файл с графом не найден')
-        sys.exit(-1)
+    wg = WikiGraph()
+    wg.load_from_file('wiki_small.txt')
 
     # TODO: статистика и гистограммы
